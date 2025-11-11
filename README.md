@@ -1,12 +1,40 @@
-# Bangkok Restaurant Data Extraction with PyOsmium
+# Bangkok POI Data Extraction with PyOsmium
 
-This project uses [pyosmium](https://github.com/osmcode/pyosmium) to extract detailed restaurant information from OpenStreetMap data for Bangkok province, Thailand.
+This project uses [pyosmium](https://github.com/osmcode/pyosmium) to extract detailed information from OpenStreetMap data for Bangkok province, Thailand. Currently supports extraction of:
+
+- **Restaurants** - Detailed restaurant information including cuisine, amenities, and contact details
+- **Rail Stations** - Train, subway, BTS, MRT, and light rail stations
+- **Bus Stops** - Public bus stops and bus stations
+
+## Quick Start
+
+```bash
+# 1. Install pyosmium
+pip install osmium
+
+# 2. Download Bangkok OSM data
+wget https://download.geofabrik.de/asia/thailand-latest.osm.pbf
+
+# 3. Extract restaurants
+python extract_bangkok_restaurants.py thailand-latest.osm.pbf
+
+# 4. Extract transit (rail stations and bus stops)
+python extract_bangkok_transit.py thailand-latest.osm.pbf
+
+# 5. Results will be in CSV and JSON files
+# - thailand-latest_restaurants.csv / .json
+# - thailand-latest_rail_stations.csv / .json
+# - thailand-latest_bus_stops.csv / .json
+# - thailand-latest_all_transit.csv / .json
+```
 
 ## Overview
 
-PyOsmium is a Python library that provides fast and flexible bindings to the Libosmium C++ library for working with OpenStreetMap data. This project demonstrates how to use pyosmium to extract specific point-of-interest data (restaurants) from OSM files.
+PyOsmium is a Python library that provides fast and flexible bindings to the Libosmium C++ library for working with OpenStreetMap data. This project demonstrates how to use pyosmium to extract specific point-of-interest data from OSM files.
 
 ## Features
+
+### Restaurant Extraction (`extract_bangkok_restaurants.py`)
 
 - **Comprehensive Data Extraction**: Extracts 30+ attributes per restaurant including:
   - Names (English, Thai, and default)
@@ -19,7 +47,32 @@ PyOsmium is a Python library that provides fast and flexible bindings to the Lib
   - Business hours
   - And more...
 
-- **Multiple OSM Entity Types**: Handles restaurants represented as nodes, ways, and relations
+### Transit Extraction (`extract_bangkok_transit.py`)
+
+- **Rail Stations**: Extracts all types of rail transit including:
+  - BTS Skytrain stations
+  - MRT Subway stations
+  - Train stations and halts
+  - Light rail and tram stops
+  - Monorail stations
+  - Station codes, line colors, and network information
+
+- **Bus Stops**: Extracts public bus infrastructure including:
+  - Regular bus stops
+  - Bus stations
+  - Route references
+  - Stop facilities (shelter, bench, lighting)
+
+- **Comprehensive Attributes**: For each transit point:
+  - Precise coordinates (latitude/longitude)
+  - Names in multiple languages (EN, TH)
+  - Network and operator information
+  - Accessibility features
+  - Facilities and amenities
+
+### Common Features
+
+- **Multiple OSM Entity Types**: Handles data represented as nodes, ways, and relations
 - **Dual Output Formats**: Exports data to both CSV and JSON formats
 - **Detailed Statistics**: Provides insights about extracted data
 - **Fast Processing**: Leverages pyosmium's C++ backend for efficient processing
@@ -103,13 +156,15 @@ osmium extract -p bangkok.poly thailand-latest.osm.pbf -o bangkok.osm.pbf
 
 ## Usage
 
-Run the extraction script with an OSM file:
+### Extracting Restaurants
+
+Run the restaurant extraction script with an OSM file:
 
 ```bash
 python extract_bangkok_restaurants.py <osm_file>
 ```
 
-### Examples
+**Examples:**
 
 ```bash
 # Using Thailand PBF file
@@ -122,14 +177,34 @@ python extract_bangkok_restaurants.py bangkok.osm.pbf
 python extract_bangkok_restaurants.py bangkok.osm
 ```
 
+### Extracting Transit (Rail Stations & Bus Stops)
+
+Run the transit extraction script with an OSM file:
+
+```bash
+python extract_bangkok_transit.py <osm_file>
+```
+
+**Examples:**
+
+```bash
+# Using Thailand PBF file
+python extract_bangkok_transit.py thailand-latest.osm.pbf
+
+# Using Bangkok extract
+python extract_bangkok_transit.py bangkok.osm.pbf
+```
+
 ### Output
 
-The script generates two output files:
+#### Restaurant Output
+
+The restaurant script generates two output files:
 
 1. **CSV file** (`<input>_restaurants.csv`): Spreadsheet-compatible format
 2. **JSON file** (`<input>_restaurants.json`): Machine-readable structured data
 
-Example output structure:
+Example restaurant output structure:
 
 ```json
 {
@@ -153,9 +228,71 @@ Example output structure:
 }
 ```
 
+#### Transit Output
+
+The transit script generates **six output files**:
+
+**Rail Stations:**
+1. `<input>_rail_stations.csv` - All rail stations in CSV format
+2. `<input>_rail_stations.json` - All rail stations in JSON format
+
+**Bus Stops:**
+3. `<input>_bus_stops.csv` - All bus stops in CSV format
+4. `<input>_bus_stops.json` - All bus stops in JSON format
+
+**Combined:**
+5. `<input>_all_transit.csv` - All transit points in CSV format
+6. `<input>_all_transit.json` - All transit points in JSON format
+
+Example rail station output:
+
+```json
+{
+  "osm_type": "node",
+  "osm_id": 987654321,
+  "type": "rail_station",
+  "transit_type": "BTS Skytrain",
+  "name": "Siam",
+  "name_en": "Siam",
+  "name_th": "สยาม",
+  "latitude": 13.7465,
+  "longitude": 100.5348,
+  "network": "BTS",
+  "operator": "Bangkok Mass Transit System",
+  "line": "Sukhumvit Line;Silom Line",
+  "ref": "CEN",
+  "colour": "green;dark_green",
+  "wheelchair": "yes",
+  "platforms": "4"
+}
+```
+
+Example bus stop output:
+
+```json
+{
+  "osm_type": "node",
+  "osm_id": 456789123,
+  "type": "bus_stop",
+  "transit_type": "Bus",
+  "name": "Victory Monument",
+  "name_en": "Victory Monument",
+  "name_th": "อนุสาวรีย์ชัยสมรภูมิ",
+  "latitude": 13.7649,
+  "longitude": 100.5375,
+  "operator": "BMTA",
+  "route_ref": "26;27;28;29",
+  "shelter": "yes",
+  "bench": "yes",
+  "wheelchair": "yes"
+}
+```
+
 ## Data Fields Extracted
 
-The script extracts the following information when available:
+### Restaurant Data Fields
+
+The restaurant script extracts the following information when available:
 
 **Basic Information:**
 - OSM type (node/way/relation) and ID
@@ -190,6 +327,39 @@ The script extracts the following information when available:
 - Internet access
 - Air conditioning
 - Smoking policy
+
+### Transit Data Fields
+
+The transit script extracts the following information when available:
+
+**Rail Stations:**
+- OSM type (node/way/relation) and ID
+- Transit type (BTS Skytrain, MRT Subway, Train Station, etc.)
+- Name (default, English, Thai)
+- **Coordinates (latitude/longitude)**
+- Network and operator information
+- Line name(s) and color(s)
+- Station code/reference
+- Number of platforms
+- Layer and level information
+- Accessibility (wheelchair, toilets)
+- Facilities (shelter, bench, lighting, covered)
+- Website and opening hours
+- Address details
+
+**Bus Stops:**
+- OSM type (node/way/relation) and ID
+- Transit type (Bus)
+- Name (default, English, Thai)
+- **Coordinates (latitude/longitude)**
+- Network and operator
+- Route references (which routes serve this stop)
+- Local stop ID/reference
+- Facilities (shelter, bench, lighting, covered)
+- Accessibility (wheelchair, tactile paving)
+- Amenities (departures board, timetable, bin)
+- Surface type
+- Address details
 
 ## Understanding the Statistics
 

@@ -8,6 +8,12 @@
 # Output Files
 *_restaurants.csv
 *_restaurants.json
+*_rail_stations.csv
+*_rail_stations.json
+*_bus_stops.csv
+*_bus_stops.json
+*_all_transit.csv
+*_all_transit.json
 
 # Python
 __pycache__/
